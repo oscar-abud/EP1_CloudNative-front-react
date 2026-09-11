@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { canManageRoles } from "@/auth/roles";
 import { useApi } from "@/api/useApi";
+import { ENDPOINT_PRODUCTOS } from "@/api/endpoints";
 import { useCollection } from "@/hooks/useCollection";
 import { Spinner } from "@/components/Spinner";
 import { Modal } from "@/components/Modal";
@@ -14,7 +15,7 @@ export function ProductosPage() {
   const api = useApi();
   const canManage = useAuthStore((state) => canManageRoles(state.roles));
   const { data: productos, loading, error, reload } = useCollection<Producto>(
-    useCallback(() => api.get<Producto[]>("/productos"), [api]),
+    useCallback(() => api.get<Producto[]>(ENDPOINT_PRODUCTOS), [api]),
   );
 
   const [modal, setModal] = useState<"closed" | "create" | "edit">("closed");
@@ -46,9 +47,9 @@ export function ProductosPage() {
     setFormError(null);
     try {
       if (editing) {
-        await api.put<Producto>(`/productos/${editing.id}`, data);
+        await api.put<Producto>(`${ENDPOINT_PRODUCTOS}/${editing.id}`, data);
       } else {
-        await api.post<Producto>("/productos", data);
+        await api.post<Producto>(ENDPOINT_PRODUCTOS, data);
       }
       closeModal();
       reload();
@@ -66,7 +67,7 @@ export function ProductosPage() {
     setSubmitting(true);
     setFormError(null);
     try {
-      await api.del(`/productos/${deleting.id}`);
+      await api.del(`${ENDPOINT_PRODUCTOS}/${deleting.id}`);
       setDeleting(null);
       reload();
     } catch (deleteError) {

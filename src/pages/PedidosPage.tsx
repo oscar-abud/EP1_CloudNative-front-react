@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { canManageRoles } from "@/auth/roles";
 import { useApi } from "@/api/useApi";
+import { ENDPOINT_PEDIDOS, ENDPOINT_PRODUCTOS } from "@/api/endpoints";
 import { useCollection } from "@/hooks/useCollection";
 import { Spinner } from "@/components/Spinner";
 import { Modal } from "@/components/Modal";
@@ -30,10 +31,10 @@ export function PedidosPage() {
   const api = useApi();
   const canManage = useAuthStore((state) => canManageRoles(state.roles));
   const { data: pedidos, loading, error, reload } = useCollection<Pedido>(
-    useCallback(() => api.get<Pedido[]>("/pedidos"), [api]),
+    useCallback(() => api.get<Pedido[]>(ENDPOINT_PEDIDOS), [api]),
   );
   const { data: productos } = useCollection<Producto>(
-    useCallback(() => api.get<Producto[]>("/productos"), [api]),
+    useCallback(() => api.get<Producto[]>(ENDPOINT_PRODUCTOS), [api]),
   );
 
   const [modal, setModal] = useState<"closed" | "create" | "edit">("closed");
@@ -64,9 +65,9 @@ export function PedidosPage() {
     setFormError(null);
     try {
       if (editing) {
-        await api.put<Pedido>(`/pedidos/${editing.id}`, data);
+        await api.put<Pedido>(`${ENDPOINT_PEDIDOS}/${editing.id}`, data);
       } else {
-        await api.post<Pedido>("/pedidos", data);
+        await api.post<Pedido>(ENDPOINT_PEDIDOS, data);
       }
       closeModal();
       reload();
