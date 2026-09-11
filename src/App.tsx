@@ -31,7 +31,7 @@ function App() {
 
       <div className="ticks"></div>
 
-      <section id="next-steps">
+      <section id="next-steps" className="flex">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
             <use href="/icons.svg#documentation-icon"></use>
