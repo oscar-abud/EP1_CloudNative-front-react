@@ -12,6 +12,21 @@ function toMessage(error: unknown): string {
   return "Error desconocido al autenticar con Microsoft Entra ID";
 }
 
+// fetchData (src/service/api) lee el token desde localStorage["token"] como
+// { token }, no desde este store. Lo espejamos ahí cada vez que cambia para
+// que ambos queden sincronizados sin duplicar dónde vive el token real.
+function persistToken(token: string | null) {
+  try {
+    if (token) {
+      localStorage.setItem("token", JSON.stringify({ token }));
+    } else {
+      localStorage.removeItem("token");
+    }
+  } catch {
+    // localStorage puede fallar (modo privado, cuota); no es crítico acá.
+  }
+}
+
 interface AuthState {
   account: AccountInfo | null;
   token: string | null;
@@ -51,6 +66,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
+    persistToken(null);
     await msalInstance.logoutRedirect();
   },
 
@@ -67,6 +83,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       const result = await msalInstance.acquireTokenSilent(request);
+      persistToken(result.accessToken);
       set({ token: result.accessToken, roles: rolesFromAccessToken(result.accessToken) });
     } catch (silentError) {
       if (!(silentError instanceof InteractionRequiredAuthError)) {
@@ -75,8 +92,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       try {
         const result = await msalInstance.acquireTokenPopup(request);
+        persistToken(result.accessToken);
         set({ token: result.accessToken, roles: rolesFromAccessToken(result.accessToken) });
       } catch (popupError) {
+        persistToken(null);
         set({ error: toMessage(popupError), token: null });
       }
     } finally {

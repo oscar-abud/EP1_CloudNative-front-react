@@ -13,7 +13,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
             Inicia sesión
           </h1>
           <p className="mb-6 text-sm text-gray-400">
-            Autentícate con tu cuenta de Microsoft (Entra ID). opencode emitirá
+            Autentícate con tu cuenta de Microsoft (Entra ID). Entra ID emitirá
             un JWT que el API Gateway validará antes de llegar al backend.
           </p>
           <SignInButton />

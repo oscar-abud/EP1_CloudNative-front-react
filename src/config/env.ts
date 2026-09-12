@@ -17,8 +17,6 @@ export const env = {
   azureRedirectUri: raw.VITE_AZURE_REDIRECT_URI || window.location.origin,
   apiBaseUrl: (raw.VITE_API_BASE_URL ?? "").replace(/\/+$/, ""),
   apiScope: required(raw.VITE_API_SCOPE, "VITE_API_SCOPE"),
-  // Backend (BFF) de otro proyecto, sin relación con el API Gateway de arriba.
-  bffUrl: (raw.VITE_BFF_URL ?? "").replace(/\/+$/, "") || undefined,
 } as const;
 
 export const isConfigured =

@@ -1,6 +1,6 @@
 import { env } from "@/config/env";
 
-// URL del backend (BFF) de otro proyecto: NO es el API Gateway de AWS
-// (ese es env.apiBaseUrl, usado por src/api). Se lee de VITE_BFF_URL
-// reutilizando el mismo módulo de env (DRY: un solo lugar parsea env).
-export const BFF_URL: string | undefined = env.bffUrl;
+// Mismo API Gateway que usa src/api (env.apiBaseUrl): las peticiones de
+// fetchData también pasan por el JWT Authorizer / CORS de AWS, no van
+// directo al backend en Render.
+export const BFF_URL: string | undefined = env.apiBaseUrl || undefined;

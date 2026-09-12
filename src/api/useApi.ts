@@ -1,18 +1,25 @@
 import { useCallback, useMemo } from "react";
-import { apiRequest, ApiError, type ApiRequestOptions } from "@/api/client";
+import { fetchData } from "@/service/api";
 import { useAuthStore } from "@/store/authStore";
 
-type BodyOptions = Omit<ApiRequestOptions, "method">;
+type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface ApiClient {
-  get: <T>(path: string, options?: BodyOptions) => Promise<T>;
-  post: <T>(path: string, body?: unknown, options?: BodyOptions) => Promise<T>;
-  put: <T>(path: string, body?: unknown, options?: BodyOptions) => Promise<T>;
-  patch: <T>(path: string, body?: unknown, options?: BodyOptions) => Promise<T>;
-  del: <T>(path: string, options?: BodyOptions) => Promise<T>;
+  get: <T>(path: string) => Promise<T>;
+  post: <T>(path: string, body?: unknown) => Promise<T>;
+  put: <T>(path: string, body?: unknown) => Promise<T>;
+  patch: <T>(path: string, body?: unknown) => Promise<T>;
+  del: <T>(path: string) => Promise<T>;
   ready: boolean;
   refreshing: boolean;
   error: string | null;
+}
+
+// fetchData espera el endpoint SIN "/" inicial (arma la URL como
+// `${API_URL}/${endpoint}`); nuestras rutas (ENDPOINT_PRODUCTOS, etc.) sí
+// llevan el "/" adelante para usarse en React Router, así que se recorta acá.
+function toFetchDataEndpoint(path: string): string {
+  return path.replace(/^\/+/, "");
 }
 
 export function useApi(): ApiClient {
@@ -21,41 +28,26 @@ export function useApi(): ApiClient {
   const error = useAuthStore((state) => state.error);
   const loadToken = useAuthStore((state) => state.loadToken);
 
-  const resolveToken = useCallback(async (): Promise<string> => {
-    if (token) {
-      return token;
-    }
-    await loadToken();
-    const fresh = useAuthStore.getState().token;
-    if (!fresh) {
-      throw new ApiError(
-        "No se pudo obtener el Access Token de Entra ID. Inicia sesión nuevamente.",
-        401,
-      );
-    }
-    return fresh;
-  }, [token, loadToken]);
-
   const send = useCallback(
-    async <T,>(
-      method: ApiRequestOptions["method"],
-      path: string,
-      body?: unknown,
-      options?: BodyOptions,
-    ): Promise<T> => {
-      const accessToken = await resolveToken();
-      return apiRequest<T>(accessToken, path, { ...options, method, body });
+    async <T,>(method: Method, path: string, body?: unknown): Promise<T> => {
+      // Asegura que haya un token fresco (y espejado en localStorage) antes
+      // de que fetchData arme el header Authorization.
+      if (!useAuthStore.getState().token) {
+        await loadToken();
+      }
+
+      return (await fetchData(toFetchDataEndpoint(path), method, undefined, body)) as T;
     },
-    [resolveToken],
+    [loadToken],
   );
 
   return useMemo<ApiClient>(
     () => ({
-      get: (path, options) => send("GET", path, undefined, options),
-      post: (path, body, options) => send("POST", path, body, options),
-      put: (path, body, options) => send("PUT", path, body, options),
-      patch: (path, body, options) => send("PATCH", path, body, options),
-      del: (path, options) => send("DELETE", path, undefined, options),
+      get: (path) => send("GET", path),
+      post: (path, body) => send("POST", path, body),
+      put: (path, body) => send("PUT", path, body),
+      patch: (path, body) => send("PATCH", path, body),
+      del: (path) => send("DELETE", path),
       ready: Boolean(token),
       refreshing: loading,
       error,
