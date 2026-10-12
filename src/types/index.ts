@@ -1,3 +1,5 @@
+import type { AppRole } from "@/auth/roles";
+
 export interface Producto {
   id: string;
   nombre: string;
@@ -59,3 +61,18 @@ export const PEDIDO_ESTADOS: PedidoEstado[] = [
   "entregado",
   "cancelado",
 ];
+
+export interface Usuario {
+  id: string;
+  nombre: string;
+  email: string;
+  activo: boolean;
+  roles: AppRole[];
+}
+
+export interface UsuarioInput {
+  nombre: string;
+  email: string;
+  password: string;
+  rol: AppRole;
+}

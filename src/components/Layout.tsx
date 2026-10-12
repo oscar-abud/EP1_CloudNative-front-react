@@ -37,9 +37,14 @@ export function Layout() {
               Pedidos
             </NavLink>
             {isAdmin && (
-              <NavLink to="/admin" className={navLinkClass}>
-                Admin
-              </NavLink>
+              <>
+                <NavLink to="/usuarios" className={navLinkClass}>
+                  Usuarios
+                </NavLink>
+                <NavLink to="/admin" className={navLinkClass}>
+                  Admin
+                </NavLink>
+              </>
             )}
           </nav>
           <div className="flex items-center gap-3">

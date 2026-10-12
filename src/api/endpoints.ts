@@ -2,3 +2,4 @@
 // repetir los strings literales en cada página (DRY).
 export const ENDPOINT_PRODUCTOS: string = "/productos";
 export const ENDPOINT_PEDIDOS: string = "/pedidos";
+export const ENDPOINT_USUARIOS: string = "/usuarios";
