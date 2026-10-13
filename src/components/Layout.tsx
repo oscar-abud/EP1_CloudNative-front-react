@@ -41,6 +41,9 @@ export function Layout() {
                 <NavLink to="/usuarios" className={navLinkClass}>
                   Usuarios
                 </NavLink>
+                <NavLink to="/mensajeria" className={navLinkClass}>
+                  Mensajería
+                </NavLink>
                 <NavLink to="/admin" className={navLinkClass}>
                   Admin
                 </NavLink>

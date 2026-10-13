@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
 import { ROLES, ROLE_LABELS, type AppRole } from "@/auth/roles";
@@ -12,18 +11,10 @@ import { Spinner } from "@/components/Spinner";
 import { Modal } from "@/components/Modal";
 import { UsuarioForm } from "@/components/UsuarioForm";
 import { btnPrimary, btnSecondary, inputClass, tdClass, thClass } from "@/components/ui";
-import { errorMessage } from "@/lib/format";
+import { apiErrorMessage } from "@/lib/format";
 import type { Usuario, UsuarioInput } from "@/types";
 
 const ALL_ROLES = Object.values(ROLES);
-
-// Prefiere el mensaje que devuelve el backend ({ message }) sobre el genérico de axios.
-function apiErrorMessage(error: unknown): string {
-  if (isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
-    return error.response.data.message;
-  }
-  return errorMessage(error);
-}
 
 export function UsuariosPage() {
   return (

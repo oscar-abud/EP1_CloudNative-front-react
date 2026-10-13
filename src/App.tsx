@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AdminPage } from "@/pages/AdminPage";
 import { HomePage } from "@/pages/HomePage";
+import { MensajeriaPage } from "@/pages/MensajeriaPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PedidosPage } from "@/pages/PedidosPage";
 import { ProductosPage } from "@/pages/ProductosPage";
@@ -26,6 +27,7 @@ function App() {
           <Route path="pedidos" element={<PedidosPage />} />
           <Route path="admin" element={<AdminPage />} />
           <Route path="usuarios" element={<UsuariosPage />} />
+          <Route path="mensajeria" element={<MensajeriaPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
