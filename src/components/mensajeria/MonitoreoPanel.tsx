@@ -7,7 +7,7 @@ import { usePolling } from "@/hooks/usePolling";
 import { Spinner } from "@/components/Spinner";
 import { btnSecondary, tdClass, thClass } from "@/components/ui";
 import { formatDate, formatPrice } from "@/lib/format";
-import type { MensajeDlq, Ticket } from "@/types";
+import type { EventoAuditoria, MensajeDlq, Ticket } from "@/types";
 
 const POLL_MS = 5000;
 
@@ -16,7 +16,6 @@ const MOTIVOS: Record<string, string> = {
   "no-recuperable": "Error no recuperable",
   expired: "Expiró (TTL)",
   maxlen: "Cola llena (max-length)",
-  unrouted: "Sin cola destino",
 };
 
 const SIMULACIONES = [
@@ -50,8 +49,12 @@ export function MonitoreoPanel() {
   const tickets = useCollection<Ticket>(
     useCallback(() => api.get<Ticket[]>(`${ENDPOINT_MENSAJERIA}/tickets`, { toast: false }), [api]),
   );
+  const eventos = useCollection<EventoAuditoria>(
+    useCallback(() => api.get<EventoAuditoria[]>(`${ENDPOINT_MENSAJERIA}/eventos`, { toast: false }), [api]),
+  );
   const { reload: reloadDlq } = dlq;
   const { reload: reloadTickets } = tickets;
+  const { reload: reloadEventos } = eventos;
 
   const refrescarEstado = useCallback(() => {
     api
@@ -66,8 +69,9 @@ export function MonitoreoPanel() {
     useCallback(() => {
       reloadDlq();
       reloadTickets();
+      reloadEventos();
       refrescarEstado();
-    }, [reloadDlq, reloadTickets, refrescarEstado]),
+    }, [reloadDlq, reloadTickets, reloadEventos, refrescarEstado]),
     POLL_MS,
   );
 
@@ -201,6 +205,45 @@ export function MonitoreoPanel() {
                     <td className={tdClass}>{t.clienteNombre}</td>
                     <td className={`${tdClass} text-right`}>{formatPrice(t.total)}</td>
                     <td className={`${tdClass} whitespace-nowrap text-gray-400`}>{formatDate(t.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-xl border border-gray-800 bg-gray-900 p-6">
+        <h2 className="mb-1 text-lg font-semibold text-white">
+          Auditoría de eventos <span className="text-sm text-blue-300">({eventos.data.length})</span>
+        </h2>
+        <p className="mb-3 text-sm text-gray-400">
+          Historial de todos los eventos (cola <code className="text-blue-300">pedidos.auditoria.queue</code>,
+          binding <code className="text-blue-300">#</code>).
+        </p>
+        {eventos.error && <p className="text-sm text-red-300">{eventos.error}</p>}
+        {eventos.loading && eventos.data.length === 0 ? (
+          <Spinner label="Cargando eventos..." />
+        ) : eventos.data.length === 0 ? (
+          <p className="text-sm text-gray-500">Aún no hay eventos registrados.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-800">
+                  <th className={thClass}>Fecha</th>
+                  <th className={thClass}>Evento</th>
+                  <th className={thClass}>Id</th>
+                </tr>
+              </thead>
+              <tbody>
+                {eventos.data.map((ev) => (
+                  <tr key={ev.id} className="border-b border-gray-800 last:border-0">
+                    <td className={`${tdClass} whitespace-nowrap text-gray-400`}>{formatDate(ev.ocurridoEn ?? ev.registradoEn)}</td>
+                    <td className={tdClass}>
+                      <span className="rounded-full bg-blue-500/15 px-2 py-0.5 text-xs text-blue-300">{ev.tipo}</span>
+                    </td>
+                    <td className={`${tdClass} font-mono text-xs text-gray-500`}>{ev.eventoId}</td>
                   </tr>
                 ))}
               </tbody>

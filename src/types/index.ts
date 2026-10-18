@@ -91,6 +91,16 @@ export interface MensajeDlq {
   createdAt: string;
 }
 
+export interface EventoAuditoria {
+  id: string;
+  eventoId: string;
+  tipo: string;
+  routingKey: string | null;
+  data: unknown;
+  ocurridoEn: string | null;
+  registradoEn: string;
+}
+
 export interface Ticket {
   id: string;
   numero: string;
