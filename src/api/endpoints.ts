@@ -12,3 +12,8 @@ export const ENDPOINT_MENSAJERIA: string = "/mensajeria";
 export const ENDPOINT_RABBIT_QUEUES: string = `${env.rabbitAdminUrl}/rabbit/queues`;
 export const ENDPOINT_RABBIT_EXCHANGES: string = `${env.rabbitAdminUrl}/rabbit/exchanges`;
 export const ENDPOINT_RABBIT_BINDINGS: string = `${env.rabbitAdminUrl}/rabbit/bindings`;
+
+// Microservicio pedidos360-kafka-admin: URL absoluta, igual que el de Rabbit.
+export const ENDPOINT_KAFKA_CLUSTER: string = `${env.kafkaAdminUrl}/kafka/cluster`;
+export const ENDPOINT_KAFKA_TOPICS: string = `${env.kafkaAdminUrl}/kafka/topics`;
+export const ENDPOINT_KAFKA_GROUPS: string = `${env.kafkaAdminUrl}/kafka/consumer-groups`;

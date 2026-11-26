@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
   readonly VITE_API_SCOPE?: string;
   readonly VITE_RABBIT_ADMIN_URL?: string;
+  readonly VITE_KAFKA_ADMIN_URL?: string;
 }
 
 interface ImportMeta {

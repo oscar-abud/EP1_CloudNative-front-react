@@ -20,6 +20,10 @@ export const env = {
   // Microservicio pedidos360-rabbit-admin. Si no se define, se asume que el
   // API Gateway lo expone bajo la misma URL base (ruta /rabbit/*).
   rabbitAdminUrl: (raw.VITE_RABBIT_ADMIN_URL || raw.VITE_API_BASE_URL || "").replace(/\/+$/, ""),
+  // Microservicio pedidos360-kafka-admin (tópicos y consumer groups). Mismo
+  // criterio que rabbitAdminUrl: si no se define, se asume que el API Gateway
+  // lo expone bajo la misma URL base (ruta /kafka/*).
+  kafkaAdminUrl: (raw.VITE_KAFKA_ADMIN_URL || raw.VITE_API_BASE_URL || "").replace(/\/+$/, ""),
 } as const;
 
 export const isConfigured =

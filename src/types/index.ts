@@ -89,6 +89,7 @@ export interface MensajeDlq {
   error: string | null;
   payload: unknown;
   createdAt: string;
+  origen: string;
 }
 
 export interface EventoAuditoria {
@@ -158,3 +159,99 @@ export interface RabbitBinding {
 }
 
 export type RabbitBindingInput = Pick<RabbitBinding, "source" | "destination" | "destinationType" | "routingKey">;
+
+// ============================ Kafka (EP5) ============================
+
+export const CLEANUP_POLICIES = ["delete", "compact", "compact,delete"] as const;
+export type CleanupPolicy = (typeof CLEANUP_POLICIES)[number];
+
+export interface KafkaBroker {
+  nodeId: number;
+  host: string;
+  port: number;
+  esController: boolean;
+}
+
+export interface KafkaCluster {
+  clusterId: string;
+  controllerId: number;
+  brokers: KafkaBroker[];
+}
+
+export interface KafkaTopic {
+  name: string;
+  numPartitions: number;
+  replicationFactor: number;
+  cleanupPolicy: string;
+  // Kafka devuelve las configuraciones como texto (y -1 = sin retencion).
+  retentionMs: string | null;
+  minInsyncReplicas: string | null;
+  particionesSincronizadas: boolean;
+  protected: boolean;
+}
+
+export interface KafkaTopicInput {
+  name: string;
+  numPartitions: number;
+  replicationFactor: number;
+  cleanupPolicy: CleanupPolicy;
+  retentionMs?: number;
+  minInsyncReplicas?: number;
+}
+
+export interface KafkaConsumerGroupResumen {
+  groupId: string;
+  state: string;
+  miembros: number;
+  protected: boolean;
+}
+
+export interface KafkaParticionLag {
+  particion: number;
+  offsetCommitteado: number;
+  highWatermark: number;
+  lag: number;
+}
+
+export interface KafkaConsumerGroupTopic {
+  topic: string;
+  particiones: KafkaParticionLag[];
+  lagTotal: number;
+}
+
+export interface KafkaConsumerGroupMiembro {
+  memberId: string;
+  clientId: string;
+  clientHost: string;
+}
+
+export interface KafkaConsumerGroup extends KafkaConsumerGroupResumen {
+  protocol: string;
+  members: KafkaConsumerGroupMiembro[];
+  topics: KafkaConsumerGroupTopic[];
+  lagTotal: number;
+}
+
+// Acumulado de ventas por producto (lo calcula el grupo pedidos360-analitica).
+export interface MetricaVenta {
+  productoId: string;
+  nombre: string;
+  unidades: number;
+  monto: number;
+  actualizadoEn: string;
+}
+
+// Contador en vivo del grupo pedidos360-back-cache (back-principal).
+export interface KafkaResumenEventos {
+  total: number;
+  porTipo: Record<string, number>;
+  particiones: Record<string, number>;
+  ultimoEvento: {
+    id: string;
+    tipo: string;
+    ocurridoEn: string;
+    partition: number;
+    offset: string;
+    leidoEn: string;
+  } | null;
+}
